@@ -59,6 +59,30 @@ A Exclusão Mútua é um problema clássico em sistemas distribuídos, onde vár
 - Implementação mais complexa.
 - Pode haver atrasos na espera por respostas.
 
+## Como executar o Projeto
+
+### Requisitos:
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### Configurar a instância do Kafka Confluent
+*Importante: A instância do Kafka Confluent é a mesma para a simulação do Relógio Lógico de Lamport e a da Exclusão Mútua.*
+
+**Para executar o Kafka (caso já tenha sido feito o build):**
+```
+make run-kafka
+```
+
+**Para visualizar se todos os containers estão UP and Running:**
+```
+docker-compose ps
+```
+
+Se tudo ocorreu bem, todos os containers do Kafka Confluent vão estão rodando e prontos para uso.
+
+### Executar o projeto de Simulação do Algoritmo do Relógio Lógico de Lamport
+
+
 ## Referências
 
 1. Algoritmo do Relógio Lógico de Lamport: https://www.geeksforgeeks.org/lamports-logical-clock/
