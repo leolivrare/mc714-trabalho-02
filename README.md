@@ -8,9 +8,7 @@ A comunicação entre os processos é realizada através do Kafka, um broker de 
 
 ## Descrição do Relógio Lógico de Lamport
 
-**Problema**: Ordenar eventos em sistemas distribuídos sem relógio global.
-
-**Solução**: O algoritmo de Lamport atribui timestamps a eventos.
+O Relógio Lógico de Lamport é uma solução para o problema de ordenação de eventos em um sistema distribuído. Este algoritmo, proposto por Leslie Lamport, permite que todos os processos em um sistema distribuído possam concordar sobre a ordem dos eventos, mesmo na ausência de um relógio global.
 
 **Funcionamento**:
 
