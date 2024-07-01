@@ -1,0 +1,39 @@
+Aqui está um pseudocódigo detalhado para um algoritmo de Lamport para exclusão mútua usando Kafka como broker de mensagens:
+
+Inicialize o relógio de Lamport (lamport_time) para 0 e a fila de mensagens (queue) para vazia.
+
+Quando um processo deseja entrar na seção crítica:
+
+2.1 Incremente o relógio de Lamport.
+
+2.2 Envie uma mensagem de solicitação para todos os outros processos através do Kafka. A mensagem deve conter o ID do processo e o tempo de Lamport.
+
+2.3 Adicione a sua própria solicitação à fila de mensagens e ordene a fila por tempo de Lamport e, em caso de empate, por ID de processo.
+
+Quando um processo recebe uma mensagem de solicitação:
+
+3.1 Atualize o relógio de Lamport para ser o máximo entre o valor atual e o tempo de Lamport na mensagem recebida, e então incremente-o.
+
+3.2 Adicione a solicitação à fila de mensagens e ordene a fila.
+
+3.3 Envie uma mensagem de reconhecimento para o processo que enviou a solicitação. A mensagem deve conter o ID do processo e o tempo de Lamport.
+
+Um processo pode entrar na seção crítica apenas quando:
+
+4.1 Sua própria solicitação está no topo da fila.
+
+4.2 Ele recebeu uma mensagem de reconhecimento para sua solicitação de todos os outros processos.
+
+Quando um processo sai da seção crítica:
+
+5.1 Remova sua própria solicitação da fila.
+
+5.2 Envie uma mensagem de liberação para todos os outros processos. A mensagem deve conter o ID do processo.
+
+Quando um processo recebe uma mensagem de liberação:
+
+6.1 Atualize o relógio de Lamport para ser o máximo entre o valor atual e o tempo de Lamport na mensagem recebida, e então incremente-o.
+
+6.2 Remova a solicitação do processo que enviou a mensagem de liberação da fila.
+
+Este pseudocódigo assume que todas as mensagens são entregues e processadas na ordem em que são enviadas, o que é garantido pelo Kafka se todas as mensagens forem enviadas para o mesmo tópico e partição. Além disso, ele assume que não há falhas de processo ou de rede.

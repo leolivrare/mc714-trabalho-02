@@ -55,9 +55,10 @@ def consume_message(consumer, process_id, lamport_time):
         except json.JSONDecodeError:
             logger.error("Failed to decode JSON message")
 
-    elif msg.error():
-        if msg.error().code() != KafkaError._PARTITION_EOF:
-            logger.error(msg.error())
+    elif msg is not None:
+        if msg.error():
+            if msg.error().code() != KafkaError._PARTITION_EOF:
+                logger.error(msg.error())
 
     return lamport_time
 

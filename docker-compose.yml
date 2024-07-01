@@ -166,16 +166,16 @@ services:
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
 
-  lamport_app_1:
-    build: ./lamport_app
+  lamport_process_1:
+    build: ./lamport
     depends_on:
       - broker
     environment:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
       PROCESS_ID: 1
 
-  lamport_app_2:
-    build: ./lamport_app
+  lamport_process_2:
+    build: ./lamport
     depends_on:
       - broker
     environment:
@@ -183,7 +183,7 @@ services:
       PROCESS_ID: 2
 
   test:
-    build: ./lamport_app
+    build: ./lamport
     depends_on:
       - broker
     environment:
