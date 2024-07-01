@@ -163,7 +163,7 @@ Escolhemos por implementar usando docker para simplificar testes locais, porém 
 ![lamport_clock: fluxo de exemplo](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/b9e2ff1b-1ef7-436a-ae8c-ccf8798327e3)
 *Figura 02: Exemplo do fluxo de atualização do relógio lógico.*
 
-### Código que faz a atualização do relógio lógico e a comunicação com o Kafka:
+### Detalhes do Código:
 
 **Produtor**:
 ```
@@ -276,6 +276,136 @@ def simulate_lamport_clock(producer, consumer, process_id):
 Toda a lógica de funcionamento do Relógio Lógico de Lamport está dentro do consumidor e produtor de mensagens para o Kafka. Toda nova mensagem produzida o algoritmo incrementa o relógio e em cada mensagem consumida o algoritmo aplica a lógica de escolher entre o maior timestamp e incrementa um sobre ele.
 
 Além disso, temos uma função chamada "simulate_lamport_clock" que serve para simular o funcionamento de um processo independente. Isto é, ele varia as ações do processo entre consumir mensagens do kafka e produzir novas mensagens, assim teremos uma simulação de como o Relógio Lógico é atualizado ao longo do tempo.
+
+### Testes Automatizados
+
+**Setup do Kafka para os Testes**
+```
+class KafkaTestCase(unittest.TestCase):
+    """
+    A test case class for testing Kafka functionality.
+
+    This class provides setup and teardown methods for creating and deleting a unique Kafka topic,
+    as well as initializing a Kafka producer and consumer for testing purposes.
+    """
+
+    def setUp(self):
+        conf = {"bootstrap.servers": "broker:29092"}
+        self.producer = Producer(conf)
+        self.consumer = Consumer(
+            {
+                "bootstrap.servers": "broker:29092",
+                "group.id": "test",
+                "auto.offset.reset": "earliest",
+            }
+        )
+
+        # Create a unique topic
+        self.topic = f"lamport_test_{uuid.uuid4()}"
+        self.admin_client = AdminClient(conf)
+        topic_config = {"num_partitions": 1, "replication_factor": 1}
+        self.admin_client.create_topics([NewTopic(self.topic, **topic_config)])
+
+        # Wait for the topic to be created
+        while self.topic not in self.admin_client.list_topics().topics:
+            time.sleep(1)
+
+    def tearDown(self):
+        self.consumer.close()
+
+        # Delete the unique topic
+        self.admin_client.delete_topics([self.topic])
+```
+
+Esse código faz o setuo do Kafka para o ambiente de testes automatizados. Ele basicamente define o produtor, consumidor e cria o tópico para receber as mensagens dos testes.
+
+**Teste do Produtor**:
+```
+class TestProduceMessages(KafkaTestCase):
+    def test_produce_messages(self):
+        process_id = "Process_1234"
+        lamport_time = 0
+
+        expected_message = {"process_id": process_id, "lamport_time": lamport_time + 1}
+
+        produce_messages(self.producer, self.topic, process_id, lamport_time)
+
+        # Subscribe to the topic
+        self.consumer.subscribe([self.topic])
+
+        # Consume the message
+        msg = self.consumer.poll(10.0)
+
+        if msg is None:
+            self.fail("No message received")
+        elif not msg.error():
+            received_message = json.loads(msg.value().decode("utf-8"))
+            self.assertEqual(received_message, expected_message)
+        elif msg.error().code() != KafkaError._PARTITION_EOF:
+            self.fail(msg.error())
+```
+
+Esse teste valida se o produtor está funcionando corretamente, inclusive se está incrementando o relógio lógico corretamente.
+
+**Testes do Consumidor**:
+```
+class TestConsumeMessages(KafkaTestCase):
+    def test_consumer_selects_producers_lamport_time(self):
+        process_id_producer = "Process_1"
+        process_id_consumer = "Process_2"
+        consumer_lamport_time = 0
+        producer_lamport_time = 10
+
+        # Increment producer's Lamport time by 1
+        produce_messages(
+            self.producer, self.topic, process_id_producer, producer_lamport_time
+        )
+
+        expected_message = {
+            "process_id": process_id_producer,
+            "lamport_time": producer_lamport_time + 1,
+        }
+
+        # Subscribe to the topic
+        self.consumer.subscribe([self.topic])
+
+        (msg, new_lamport_time) = consume_message(
+            self.consumer, process_id_consumer, consumer_lamport_time
+        )
+
+        assert msg == expected_message
+
+        assert new_lamport_time == producer_lamport_time + 2
+
+    def test_consumer_selects_consumers_lamport_time(self):
+        process_id_producer = "Process_1"
+        process_id_consumer = "Process_2"
+        consumer_lamport_time = 5
+        producer_lamport_time = 0
+
+        # Increment producer's Lamport time by 1
+        produce_messages(
+            self.producer, self.topic, process_id_producer, producer_lamport_time
+        )
+
+        expected_message = {
+            "process_id": process_id_producer,
+            "lamport_time": producer_lamport_time + 1,
+        }
+
+        # Subscribe to the topic
+        self.consumer.subscribe([self.topic])
+
+        (msg, new_lamport_time) = consume_message(
+            self.consumer, process_id_consumer, consumer_lamport_time
+        )
+
+        assert msg == expected_message
+
+        assert new_lamport_time == consumer_lamport_time + 1
+```
+
+Esse conjunto de testes valida o funcionamento do consumidor e da lógica de atualização do Lamport Time baseado nas mensagens recebidas. Esse teste garante que as mensagens do kafka estão sendo consumidas corretamente e o relógio lógico está sendo atualizado corretamente.
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
