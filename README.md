@@ -32,3 +32,29 @@ O Relógio Lógico de Lamport é uma solução para o problema de ordenação de
 
 - Imprecisão em relação ao tempo real.
 - Não garante ordenação total em todos os casos.
+
+## Descrição do problema da Exclusão Mútua
+
+A Exclusão Mútua é um problema clássico em sistemas distribuídos, onde vários processos precisam acessar um recurso compartilhado, mas apenas um processo pode acessar o recurso de cada vez. O algoritmo do Relógio Lógico de Lamport pode ser usado para resolver este problema.
+
+**Funcionamento**:
+
+1. Solicitação para entrar na seção crítica:
+   - Enviar mensagem com timestamp para todos os outros processos.
+2. Permissão para entrar:
+   - Só pode entrar se:
+     - Recebeu resposta de todos os outros processos.
+     - Não há outra solicitação pendente com timestamp menor.
+3. Garantias:
+   - Apenas um processo na seção crítica por vez.
+   - Ordem das solicitações é respeitada.
+
+**Vantagens**:
+
+- Evita conflitos de acesso.
+- Garante ordenação justa.
+
+**Desvantagens**:
+
+- Implementação mais complexa.
+- Pode haver atrasos na espera por respostas.
