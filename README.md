@@ -8,11 +8,11 @@ A comunicação entre os processos é realizada através do Kafka, um broker de 
 
 ## Descrição do Relógio Lógico de Lamport
 
-*Problema*: Ordenar eventos em sistemas distribuídos sem relógio global.
+**Problema**: Ordenar eventos em sistemas distribuídos sem relógio global.
 
-*Solução*: O algoritmo de Lamport atribui timestamps a eventos.
+**Solução**: O algoritmo de Lamport atribui timestamps a eventos.
 
-*Funcionamento*:
+**Funcionamento**:
 
 - Cada processo possui um contador local (relógio).
 - Evento local: o contador é incrementado.
@@ -21,16 +21,16 @@ A comunicação entre os processos é realizada através do Kafka, um broker de 
     - Se o timestamp for maior que o contador local, o contador local é atualizado para o valor máximo (timestamp ou contador local).
     - O contador local é incrementado.
     
-*Resultado*:
+**Resultado**:
 
 - Os processos concordam com a ordem dos eventos, mesmo sem um relógio global.
 
-*Vantagens*:
+**Vantagens**:
 
 - Simplicidade e eficiência.
 - Não há necessidade de um relógio global.
 
-*Desvantagens*:
+**Desvantagens**:
 
 - Imprecisão em relação ao tempo real.
 - Não garante ordenação total em todos os casos.
