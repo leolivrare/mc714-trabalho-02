@@ -570,10 +570,40 @@ Esse conjunto de testes garante o funcionamento correto da função que solicita
 
 **Logs do Processo 01**:
 ```
+INFO:1:Starting process with ID: 1
+INFO:utils:{"event": "Delivered message with Lamport time 1 to topic lamport_test_1", "lamport_time": 1}
+INFO:utils:{"event": "Delivered message with Lamport time 2 to topic lamport_test_1", "lamport_time": 2}
+INFO:utils:{"event": "Delivered message with Lamport time 3 to topic lamport_test_1", "lamport_time": 3}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 1. Updated Lamport time: max(3, 1)+1 = 4", "lamport_time": 4}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 2. Updated Lamport time: max(4, 2)+1 = 5", "lamport_time": 5}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 6. Updated Lamport time: max(5, 6)+1 = 7", "lamport_time": 7}
+INFO:utils:{"event": "Delivered message with Lamport time 8 to topic lamport_test_1", "lamport_time": 8}
+INFO:utils:{"event": "Delivered message with Lamport time 9 to topic lamport_test_1", "lamport_time": 9}
+INFO:utils:{"event": "Delivered message with Lamport time 10 to topic lamport_test_1", "lamport_time": 10}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 7. Updated Lamport time: max(10, 7)+1 = 11", "lamport_time": 11}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 12. Updated Lamport time: max(11, 12)+1 = 13", "lamport_time": 13}
+INFO:utils:{"event": "Delivered message with Lamport time 14 to topic lamport_test_1", "lamport_time": 14}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 16. Updated Lamport time: max(14, 16)+1 = 17", "lamport_time": 17}
 ```
 
 **Logs do Processo 02**:
 ```
+INFO:2:Starting process with ID: 2
+INFO:utils:{"event": "Delivered message with Lamport time 1 to topic lamport_test_1", "lamport_time": 1}
+INFO:utils:{"event": "Delivered message with Lamport time 2 to topic lamport_test_1", "lamport_time": 2}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 1. Updated Lamport time: max(2, 1)+1 = 3", "lamport_time": 3}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 2. Updated Lamport time: max(3, 2)+1 = 4", "lamport_time": 4}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 3. Updated Lamport time: max(4, 3)+1 = 5", "lamport_time": 5}
+INFO:utils:{"event": "Delivered message with Lamport time 6 to topic lamport_test_1", "lamport_time": 6}
+INFO:utils:{"event": "Delivered message with Lamport time 7 to topic lamport_test_1", "lamport_time": 7}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 8. Updated Lamport time: max(7, 8)+1 = 9", "lamport_time": 9}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 9. Updated Lamport time: max(9, 9)+1 = 10", "lamport_time": 10}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 10. Updated Lamport time: max(10, 10)+1 = 11", "lamport_time": 11}
+INFO:utils:{"event": "Delivered message with Lamport time 12 to topic lamport_test_1", "lamport_time": 12}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 14. Updated Lamport time: max(12, 14)+1 = 15", "lamport_time": 15}
+INFO:utils:{"event": "Delivered message with Lamport time 16 to topic lamport_test_1", "lamport_time": 16}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 18. Updated Lamport time: max(16, 18)+1 = 19", "lamport_time": 19}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 19. Updated Lamport time: max(19, 19)+1 = 20", "lamport_time": 20}
 ```
 
 ## Execução do Algoritmo de Exclusão Mútua
