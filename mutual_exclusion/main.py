@@ -79,7 +79,7 @@ def request_critical_section(
                     logger.info(f"Process {process_id} updated message queue: {message_queue}")
                 except ValueError:
                     pass
-
+        logger.info(f"Process {process_id} updated acknowledged: {acknowledged}")
         if (
             message_queue[0]['process_id'] == process_id and len(acknowledged) == 2
         ):  # Assuming there are 3 processes in total
