@@ -58,3 +58,17 @@ A Exclusão Mútua é um problema clássico em sistemas distribuídos, onde vár
 
 - Implementação mais complexa.
 - Pode haver atrasos na espera por respostas.
+
+## Referências
+
+1. Algoritmo do Relógio Lógico de Lamport: https://www.geeksforgeeks.org/lamports-logical-clock/
+2. Algoritmo de Exclusão Mútua com Relógio Lógico de Lamport: https://www.geeksforgeeks.org/lamports-algorithm-for-mutual-exclusion-in-distributed-system/
+3. Kafka Confluent Docker Setup: https://docs.confluent.io/platform/current/platform-quickstart.html
+4. GitHub Copilot para dúvidas e aceleração na escrita do código.
+
+**Uso das referências**:
+
+- O algoritmo descrito na referência [1] me ajudou a construir a lógica que foi aplicada no projeto. Porém, nenhum código foi copiado da referência, apenas o algoritmo descrito no texto. Isto é, o código final do Relógio Lógico de Lamport foi inteiramente construído por mim, utilizando o GitHub Copilot apenas para acelerar na escrita e ajustes de sintaxe.
+- O algoritmo descrito na referência [2] me ajudou a construir a lógica que faz a Exclusão Mútua funcionar. Reutilizei quase todo o código do Relógio Lógico de Lamport, construído na primeira parte do projeto, para viabilizar essa implementação.
+- O docker-compose teve como base a documentação do Kafka Confluent, indicado na referência [3]. Toda a parte que levanta o broker de mensagens foi retirado inteiramente da documentação.
+- O GitHub Copilot (referência [4]) foi utilizado para acelerar a escrita do código e consulta de dúvidas. Porém, nenhuma informação foi utilizada sem validação e confirmação de fontes confiáveis.
