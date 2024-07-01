@@ -409,6 +409,163 @@ Esse conjunto de testes valida o funcionamento do consumidor e da lógica de atu
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
+### Bibliotecas e Ambiente de Execução:
+O algoritmo de Exclusão Mútua foi inteiramente implementado em Python, com o Kafka Confluent como broker de mensagens. Reutilizamos toda a implementação do algoritmo do Relógio Lógico de Lamport para implementar a lógica de Exclusão Mútua. Isto é, resolvemos o problema da Exclusão Mútua com o Relógio Lógico de Lamport fazendo o controle da ordem dos eventos, onde temos bem definido quem solicitou primeiro para acessar uma seção crítica.
+Escolhemos por implementar usando docker para simplificar testes locais, porém é muito simples subir todos os containers num ambiente cloud. Por exemplo, podemos criar as imagens docker e subir os sistemas numa EC2 da AWS, subindo as imagens docker personalizadas via ECR.
+
+**Bibliotecas Externas Utilizadas**:
+- **confluent_kafka**: Biblioteca que possibilita a publicação e consumo de mensagens dos tópicos do Kafka.
+- **pytest**: Biblioteca utilizada para execução dos testes automatizados do projeto.
+
+### Estrutura de comunicação:
+*Importante: Essa estrutura é exatamente a mesma da implementação anterior. Toda a dinâmica de troca de mensagens via Kafka e atualização do relógio lógico foram reaproveitados*
+
+![image](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/3a6db8a0-e20e-49d0-8a2d-e08b4c29d3b7)
+*Figura 03: Estrutura de comunicação na simulação de Exclusão Mútua*
+
+### Detalhes do Código:
+
+**Lógica de solicitar acesso a uma região crítica**:
+```
+def request_critical_section(
+    producer, consumer, process_id, lamport_time, message_queue
+):
+    logger.info(f"Process {process_id} is requesting critical section.")
+    lamport_time = produce_messages(
+        producer,
+        "mutual_exclusion_test_1",
+        process_id,
+        lamport_time,
+        content={"event": "request"},
+    )
+
+    message_queue.append({"lamport_time": lamport_time, "process_id": process_id})
+    sort_message_queue(message_queue)
+    logger.info(f"Process {process_id} updated message queue: {message_queue}")
+
+    acknowledged = set()
+
+    while True:
+        message, lamport_time = consume_message(consumer, process_id, lamport_time)
+
+        if message is not None:
+            if message["process_id"] == process_id:
+                continue
+
+            event = message["event"]
+            sender_id = message["process_id"]
+            sender_time = message["lamport_time"]
+
+            if event == "reply":
+                acknowledged.add(sender_id)
+
+            elif event == "request":
+                message_queue.append(
+                    {"lamport_time": sender_time, "process_id": sender_id}
+                )
+                sort_message_queue(message_queue)
+                logger.info(
+                    f"Process {process_id} updated message queue: {message_queue}"
+                )
+
+                lamport_time = produce_messages(
+                    producer,
+                    "mutual_exclusion_test_1",
+                    process_id,
+                    lamport_time,
+                    content={"event": "reply"},
+                )
+
+            elif event == "release":
+                try:
+                    remove_from_queue(message_queue, sender_id)
+                    sort_message_queue(message_queue)
+                    logger.info(
+                        f"Process {process_id} updated message queue: {message_queue}"
+                    )
+                except ValueError:
+                    pass
+        logger.info(f"Process {process_id} updated acknowledged: {acknowledged}")
+        if (
+            message_queue[0]["process_id"] == process_id and len(acknowledged) == 2
+        ):  # Assuming there are 3 processes in total
+            break
+
+    logger.info(f"Process {process_id} is entering critical section.")
+    time.sleep(random.randint(1, 5))
+
+    message_queue.pop(0)
+    logger.info(f"Process {process_id} updated message queue: {message_queue}")
+
+    lamport_time = produce_messages(
+        producer,
+        "mutual_exclusion_test_1",
+        process_id,
+        lamport_time,
+        content={"event": "release"},
+    )
+
+    logger.info(f"Process {process_id} has left critical section.")
+    return lamport_time, message_queue
+```
+
+Esse código é responsável por toda a lógica da exclusão mútua. Basicamente, ele funciona da seguinte forma:
+- Cada processo tem seu próprio relógio lógico e sua fila de pedidos
+- Quando um processo deseja acessar uma região crítica, ele envia uma mensagem no Kafka do tipo "request", junto com seu lamport_time. Além disso, ele adiciona seu pedido na fila e ordena ela pelo lamport_time e process_id.
+- Quando um outro processo recebe a mensagem de "request", deve enviar uma mensagem de "OK" para o pedido e atualizar seu relógio lógico
+- Quando o processo que solicitou o acesso recebe OK de todos os demais processos e seu pedido é o primeiro da fila, ele acessa a região crítica.
+- Quando o processo sai da região crítica, ele deve publicar uma mensagem de "release" no Kafka e remover seu pedido da fila.
+- Quando um processo recebe uma mensagem de "release", deve remover aquele pedido em questão da fila
+
+
+### Testes Automatizados:
+
+**Teste do Código de pedido de acesso à Região Crítica**:
+```
+class TestRequestCriticalSection(KafkaTestCase):
+    def test_request_critical_section(self):
+        process_id = 1
+        lamport_time = 0
+        message_queue = []
+
+        # Subscribe to the topic
+        self.consumer.subscribe([self.topic])
+
+        produce_messages(self.producer, self.topic, 2, lamport_time+1, content={"event": "reply"})
+        produce_messages(self.producer, self.topic, 3, lamport_time+1, content={"event": "reply"})
+
+        # Alterar para ser uma chamada async
+        lamport_time, message_queue = request_critical_section(self.producer, self.consumer, process_id, lamport_time, message_queue)
+
+        # Analisa as variaveis lamport_time e message_queue após a execução da função request_critical_section. 
+        self.assertEqual(lamport_time, 5)
+        self.assertEqual(len(message_queue), 0)
+
+    def test_request_critical_section_with_more_requests(self):
+        process_id = 1
+        lamport_time = 0
+        message_queue = []
+
+        # Subscribe to the topic
+        self.consumer.subscribe([self.topic])
+
+        produce_messages(self.producer, self.topic, 2, lamport_time+1, content={"event": "request"})
+        produce_messages(self.producer, self.topic, 3, lamport_time+2, content={"event": "request"})
+        produce_messages(self.producer, self.topic, 2, lamport_time+3, content={"event": "reply"})
+        produce_messages(self.producer, self.topic, 3, lamport_time+4, content={"event": "reply"})
+
+        # Alterar para ser uma chamada async
+        lamport_time, message_queue = request_critical_section(self.producer, self.consumer, process_id, lamport_time, message_queue)
+
+        # Analisa as variaveis lamport_time e message_queue após a execução da função request_critical_section. 
+        self.assertEqual(lamport_time, 9)
+
+        expected_queue = [{"lamport_time": 2, "process_id": 2}, {"lamport_time": 3, "process_id": 3}]
+        assert expected_queue == message_queue
+```
+
+Esse conjunto de testes garante o funcionamento correto da função que solicita acesso a uma região crítica. Basicamente, validamos se o lamport_time foi atualizado corretamente e se o processo acessou a região crítica corretamente.
+
 ## Referências
 
 1. Algoritmo do Relógio Lógico de Lamport: https://www.geeksforgeeks.org/lamports-logical-clock/
