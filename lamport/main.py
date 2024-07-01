@@ -12,6 +12,17 @@ logger = logging.getLogger(__name__)
 
 
 def simulate_lamport_clock(producer, consumer, process_id):
+    """
+    Simulates the Lamport logical clock for a given process.
+
+    Args:
+        producer: The producer object used to send messages.
+        consumer: The consumer object used to receive messages.
+        process_id: The ID of the current process.
+
+    Returns:
+        None
+    """
     lamport_time = 0
     while True:
         start_time = time.time()

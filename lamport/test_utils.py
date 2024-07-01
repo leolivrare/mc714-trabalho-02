@@ -9,6 +9,13 @@ from utils import consume_message, produce_messages
 
 
 class KafkaTestCase(unittest.TestCase):
+    """
+    A test case class for testing Kafka functionality.
+
+    This class provides setup and teardown methods for creating and deleting a unique Kafka topic,
+    as well as initializing a Kafka producer and consumer for testing purposes.
+    """
+
     def setUp(self):
         conf = {"bootstrap.servers": "broker:29092"}
         self.producer = Producer(conf)
