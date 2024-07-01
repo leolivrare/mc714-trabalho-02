@@ -9,6 +9,16 @@ logger = logging.getLogger(__name__)
 
 
 def delivery_report(err: Optional[KafkaError], msg: Message) -> None:
+    """
+    Callback function to handle delivery reports for Kafka messages.
+
+    Args:
+        err (Optional[KafkaError]): The error, if any, that occurred during message delivery.
+        msg (Message): The Kafka message that was delivered.
+
+    Returns:
+        None
+    """
     if err is not None:
         logger.error(f"Message delivery failed: {err}")
     else:
@@ -28,6 +38,19 @@ def produce_messages(
     lamport_time: int,
     content: Dict[str, Any] = {},
 ) -> int:
+    """
+    Produces a message to a Kafka topic using the provided producer.
+
+    Args:
+        producer (Producer): The Kafka producer instance.
+        topic (str): The name of the Kafka topic to produce the message to.
+        process_id (int): The ID of the process producing the message.
+        lamport_time (int): The current Lamport time.
+        content (Dict[str, Any], optional): Additional content to include in the message. Defaults to {}.
+
+    Returns:
+        int: The updated Lamport time after producing the message.
+    """
     lamport_time += 1
     message = {"process_id": process_id, "lamport_time": lamport_time}
     message.update(content)
@@ -42,6 +65,17 @@ def produce_messages(
 def consume_message(
     consumer: Consumer, process_id: int, lamport_time: int
 ) -> Tuple[Dict[str, Any], int]:
+    """
+    Consume a message from the Kafka consumer and update the Lamport time.
+
+    Args:
+        consumer (Consumer): The Kafka consumer instance.
+        process_id (int): The ID of the current process.
+        lamport_time (int): The current Lamport time.
+
+    Returns:
+        Tuple[Dict[str, Any], int]: A tuple containing the consumed message and the updated Lamport time.
+    """
     msg = consumer.poll(1.0)
     message = None
     if msg is not None and not msg.error():
