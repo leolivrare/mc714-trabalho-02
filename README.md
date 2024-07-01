@@ -566,6 +566,146 @@ class TestRequestCriticalSection(KafkaTestCase):
 
 Esse conjunto de testes garante o funcionamento correto da função que solicita acesso a uma região crítica. Basicamente, validamos se o lamport_time foi atualizado corretamente e se o processo acessou a região crítica corretamente.
 
+## Execução do Algoritmo do Relógio Lógico de Lamport
+
+**Logs do Processo 01**:
+```
+```
+
+**Logs do Processo 02**:
+```
+```
+
+## Execução do Algoritmo de Exclusão Mútua
+
+**Logs do Processo 01**:
+```
+INFO:1:Starting process with ID: 1
+INFO:1:Process 1 is requesting critical section.
+INFO:utils:{"event": "Delivered message with Lamport time 1 to topic mutual_exclusion_test_1", "lamport_time": 1, "message": {"process_id": "1", "lamport_time": 1, "event": "request"}}
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '1'}]
+INFO:utils:{"event": "Received message from process 2 with Lamport time 1. Updated Lamport time: max(1, 1)+1 = 2", "lamport_time": 2, "message": {"process_id": "2", "lamport_time": 1, "event": "request"}}
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '1'}, {'lamport_time': 1, 'process_id': '2'}]
+INFO:utils:{"event": "Delivered message with Lamport time 3 to topic mutual_exclusion_test_1", "lamport_time": 3, "message": {"process_id": "1", "lamport_time": 3, "event": "reply"}}
+INFO:1:Process 1 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 3 with Lamport time 1. Updated Lamport time: max(3, 1)+1 = 4", "lamport_time": 4, "message": {"process_id": "3", "lamport_time": 1, "event": "request"}}
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '1'}, {'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 5 to topic mutual_exclusion_test_1", "lamport_time": 5, "message": {"process_id": "1", "lamport_time": 5, "event": "reply"}}
+INFO:1:Process 1 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 2 with Lamport time 3. Updated Lamport time: max(5, 3)+1 = 6", "lamport_time": 6, "message": {"process_id": "2", "lamport_time": 3, "event": "reply"}}
+INFO:1:Process 1 updated acknowledged: {'2'}
+INFO:utils:{"event": "Received message from process 3 with Lamport time 3. Updated Lamport time: max(6, 3)+1 = 7", "lamport_time": 7, "message": {"process_id": "3", "lamport_time": 3, "event": "reply"}}
+INFO:1:Process 1 updated acknowledged: {'2', '3'}
+INFO:1:Process 1 is entering critical section.
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 8 to topic mutual_exclusion_test_1", "lamport_time": 8, "message": {"process_id": "1", "lamport_time": 8, "event": "release"}}
+INFO:1:Process 1 has left critical section.
+INFO:1:Process 1 is executing other actions outside of the critical section.
+INFO:utils:{"event": "Received message from process 2 with Lamport time 5. Updated Lamport time: max(8, 5)+1 = 9", "lamport_time": 9, "message": {"process_id": "2", "lamport_time": 5, "event": "reply"}}
+INFO:utils:{"event": "Received message from process 3 with Lamport time 5. Updated Lamport time: max(9, 5)+1 = 10", "lamport_time": 10, "message": {"process_id": "3", "lamport_time": 5, "event": "reply"}}
+INFO:1:Process 1 is executing other actions outside of the critical section. Lamport time: 11
+INFO:utils:{"event": "Received message from process 2 with Lamport time 11. Updated Lamport time: max(11, 11)+1 = 12", "lamport_time": 12, "message": {"process_id": "2", "lamport_time": 11, "event": "release"}}
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Received message from process 2 with Lamport time 12. Updated Lamport time: max(12, 12)+1 = 13", "lamport_time": 13, "message": {"process_id": "2", "lamport_time": 12, "event": "request"}}
+INFO:1:Process 1 updated message queue: [{'lamport_time': 1, 'process_id': '3'}, {'lamport_time': 12, 'process_id': '2'}]
+```
+
+**Logs do Processo 02**:
+```
+INFO:2:Starting process with ID: 2
+INFO:2:Process 2 is requesting critical section.
+INFO:utils:{"event": "Delivered message with Lamport time 1 to topic mutual_exclusion_test_1", "lamport_time": 1, "message": {"process_id": "2", "lamport_time": 1, "event": "request"}}
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '2'}]
+INFO:utils:{"event": "Received message from process 3 with Lamport time 1. Updated Lamport time: max(1, 1)+1 = 2", "lamport_time": 2, "message": {"process_id": "3", "lamport_time": 1, "event": "request"}}
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 3 to topic mutual_exclusion_test_1", "lamport_time": 3, "message": {"process_id": "2", "lamport_time": 3, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 1 with Lamport time 1. Updated Lamport time: max(3, 1)+1 = 4", "lamport_time": 4, "message": {"process_id": "1", "lamport_time": 1, "event": "request"}}
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '1'}, {'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 5 to topic mutual_exclusion_test_1", "lamport_time": 5, "message": {"process_id": "2", "lamport_time": 5, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 3 with Lamport time 3. Updated Lamport time: max(5, 3)+1 = 6", "lamport_time": 6, "message": {"process_id": "3", "lamport_time": 3, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: {'3'}
+INFO:utils:{"event": "Received message from process 3 with Lamport time 5. Updated Lamport time: max(6, 5)+1 = 7", "lamport_time": 7, "message": {"process_id": "3", "lamport_time": 5, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: {'3'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 3. Updated Lamport time: max(7, 3)+1 = 8", "lamport_time": 8, "message": {"process_id": "1", "lamport_time": 3, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 5. Updated Lamport time: max(8, 5)+1 = 9", "lamport_time": 9, "message": {"process_id": "1", "lamport_time": 5, "event": "reply"}}
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 8. Updated Lamport time: max(9, 8)+1 = 10", "lamport_time": 10, "message": {"process_id": "1", "lamport_time": 8, "event": "release"}}
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:2:Process 2 updated acknowledged: {'1', '3'}
+INFO:2:Process 2 is entering critical section.
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 11 to topic mutual_exclusion_test_1", "lamport_time": 11, "message": {"process_id": "2", "lamport_time": 11, "event": "release"}}
+INFO:2:Process 2 has left critical section.
+INFO:2:Process 2 is requesting critical section.
+INFO:utils:{"event": "Delivered message with Lamport time 12 to topic mutual_exclusion_test_1", "lamport_time": 12, "message": {"process_id": "2", "lamport_time": 12, "event": "request"}}
+INFO:2:Process 2 updated message queue: [{'lamport_time': 1, 'process_id': '3'}, {'lamport_time': 12, 'process_id': '2'}]
+```
+
+**Logs do Processo 03**:
+```
+INFO:3:Starting process with ID: 3
+INFO:3:Process 3 is requesting critical section.
+INFO:utils:{"event": "Delivered message with Lamport time 1 to topic mutual_exclusion_test_1", "lamport_time": 1, "message": {"process_id": "3", "lamport_time": 1, "event": "request"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Received message from process 2 with Lamport time 1. Updated Lamport time: max(1, 1)+1 = 2", "lamport_time": 2, "message": {"process_id": "2", "lamport_time": 1, "event": "request"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 3 to topic mutual_exclusion_test_1", "lamport_time": 3, "message": {"process_id": "3", "lamport_time": 3, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 1 with Lamport time 1. Updated Lamport time: max(3, 1)+1 = 4", "lamport_time": 4, "message": {"process_id": "1", "lamport_time": 1, "event": "request"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 1, 'process_id': '1'}, {'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 5 to topic mutual_exclusion_test_1", "lamport_time": 5, "message": {"process_id": "3", "lamport_time": 5, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 2 with Lamport time 3. Updated Lamport time: max(5, 3)+1 = 6", "lamport_time": 6, "message": {"process_id": "2", "lamport_time": 3, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'2'}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 5. Updated Lamport time: max(6, 5)+1 = 7", "lamport_time": 7, "message": {"process_id": "2", "lamport_time": 5, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'2'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 3. Updated Lamport time: max(7, 3)+1 = 8", "lamport_time": 8, "message": {"process_id": "1", "lamport_time": 3, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 5. Updated Lamport time: max(8, 5)+1 = 9", "lamport_time": 9, "message": {"process_id": "1", "lamport_time": 5, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 8. Updated Lamport time: max(9, 8)+1 = 10", "lamport_time": 10, "message": {"process_id": "1", "lamport_time": 8, "event": "release"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 1, 'process_id': '2'}, {'lamport_time': 1, 'process_id': '3'}]
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 11. Updated Lamport time: max(10, 11)+1 = 12", "lamport_time": 12, "message": {"process_id": "2", "lamport_time": 11, "event": "release"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 1, 'process_id': '3'}]
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 is entering critical section.
+INFO:3:Process 3 updated message queue: []
+INFO:utils:{"event": "Delivered message with Lamport time 13 to topic mutual_exclusion_test_1", "lamport_time": 13, "message": {"process_id": "3", "lamport_time": 13, "event": "release"}}
+INFO:3:Process 3 has left critical section.
+INFO:3:Process 3 is requesting critical section.
+INFO:utils:{"event": "Delivered message with Lamport time 14 to topic mutual_exclusion_test_1", "lamport_time": 14, "message": {"process_id": "3", "lamport_time": 14, "event": "request"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 14, 'process_id': '3'}]
+INFO:utils:{"event": "Received message from process 2 with Lamport time 12. Updated Lamport time: max(14, 12)+1 = 15", "lamport_time": 15, "message": {"process_id": "2", "lamport_time": 12, "event": "request"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 12, 'process_id': '2'}, {'lamport_time': 14, 'process_id': '3'}]
+INFO:utils:{"event": "Delivered message with Lamport time 16 to topic mutual_exclusion_test_1", "lamport_time": 16, "message": {"process_id": "3", "lamport_time": 16, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: set()
+INFO:utils:{"event": "Received message from process 1 with Lamport time 14. Updated Lamport time: max(16, 14)+1 = 17", "lamport_time": 17, "message": {"process_id": "1", "lamport_time": 14, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'1'}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 18. Updated Lamport time: max(17, 18)+1 = 19", "lamport_time": 19, "message": {"process_id": "2", "lamport_time": 18, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:utils:{"event": "Received message from process 1 with Lamport time 20. Updated Lamport time: max(19, 20)+1 = 21", "lamport_time": 21, "message": {"process_id": "1", "lamport_time": 20, "event": "reply"}}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:utils:{"event": "Received message from process 2 with Lamport time 20. Updated Lamport time: max(21, 20)+1 = 22", "lamport_time": 22, "message": {"process_id": "2", "lamport_time": 20, "event": "release"}}
+INFO:3:Process 3 updated message queue: [{'lamport_time': 14, 'process_id': '3'}]
+INFO:3:Process 3 updated acknowledged: {'1', '2'}
+INFO:3:Process 3 is entering critical section.
+INFO:3:Process 3 updated message queue: []
+INFO:utils:{"event": "Delivered message with Lamport time 23 to topic mutual_exclusion_test_1", "lamport_time": 23, "message": {"process_id": "3", "lamport_time": 23, "event": "release"}}
+INFO:3:Process 3 has left critical section.
+```
+
 ## Referências
 
 1. Algoritmo do Relógio Lógico de Lamport: https://www.geeksforgeeks.org/lamports-logical-clock/
