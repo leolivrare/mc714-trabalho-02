@@ -1,4 +1,4 @@
-# mc714-trabalho-02
+# Trabalho 02 de Sistemas Distribuidos (MC714)
 
 ## Objetivo
 
@@ -143,6 +143,10 @@ make stop-mutual-exclusion-apps
 ```
 make run-mutual-exclusion-tests
 ```
+
+## Detalhes de Implementação do Algoritmo e Simulação do Relógio Lógico de Lamport
+
+## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
 ## Referências
 
