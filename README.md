@@ -65,7 +65,7 @@ A Exclusão Mútua é um problema clássico em sistemas distribuídos, onde vár
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-**Build do Projeto completo**
+### Build do Projeto
 ```
 make build-all
 ```
@@ -87,6 +87,62 @@ Se tudo ocorreu bem, todos os containers do Kafka Confluent vão estão rodando 
 
 ### Executar o projeto de Simulação do Algoritmo do Relógio Lógico de Lamport
 
+**Para criar o tópico no Kafka:**
+```
+make create-lamport-topic
+```
+
+**Para levantar os dois processos e iniciar a simulação:**
+```
+make run-lamport-apps
+```
+
+**Para visualizar os logs dos processos em execução:**
+```
+make logs-lamport-apps
+make logs-lamport-app1
+make logs-lamport-app2
+```
+
+**Para parar os processos em execução:**
+```
+make stop-lamport-apps
+```
+
+**Para executar os testes automatizados:**
+```
+make run-lamport-tests
+```
+
+### Executar o projeto de Simulação do Problema de Exclusão Mútua
+
+**Para criar o tópico no Kafka:**
+```
+make create-mutual-exclusion-topic
+```
+
+**Para levantar os três processos e iniciar a simulação:**
+```
+make run-mutual-exclusion-apps
+```
+
+**Para visualizar os logs dos processos em execução:**
+```
+make logs-mutual-exclusion-apps
+make logs-mutual-exclusion-app1
+make logs-mutual-exclusion-app2
+make logs-mutual-exclusion-app3
+```
+
+**Para parar os processos em execução:**
+```
+make stop-mutual-exclusion-apps
+```
+
+**Para executar os testes automatizados:**
+```
+make run-mutual-exclusion-tests
+```
 
 ## Referências
 
