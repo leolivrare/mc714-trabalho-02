@@ -163,6 +163,119 @@ Escolhemos por implementar usando docker para simplificar testes locais, porém 
 ![lamport_clock: fluxo de exemplo](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/b9e2ff1b-1ef7-436a-ae8c-ccf8798327e3)
 *Figura 02: Exemplo do fluxo de atualização do relógio lógico.*
 
+### Código que faz a atualização do relógio lógico e a comunicação com o Kafka:
+
+**Produtor**:
+```
+def produce_messages(
+    producer: Producer,
+    topic: str,
+    process_id: int,
+    lamport_time: int,
+    content: Dict[str, Any] = {},
+) -> int:
+    """
+    Produces a message to a Kafka topic using the provided producer.
+
+    Args:
+        producer (Producer): The Kafka producer instance.
+        topic (str): The name of the Kafka topic to produce the message to.
+        process_id (int): The ID of the process producing the message.
+        lamport_time (int): The current Lamport time.
+        content (Dict[str, Any], optional): Additional content to include in the message. Defaults to {}.
+
+    Returns:
+        int: The updated Lamport time after producing the message.
+    """
+    lamport_time += 1
+    message = {"process_id": process_id, "lamport_time": lamport_time}
+    message.update(content)
+    producer.poll(0)
+    producer.produce(
+        topic, json.dumps(message).encode("utf-8"), callback=delivery_report
+    )
+    producer.flush()
+    return lamport_time
+```
+
+**Consumidor**:
+```
+def consume_message(
+    consumer: Consumer, process_id: int, lamport_time: int
+) -> Tuple[Dict[str, Any], int]:
+    """
+    Consume a message from the Kafka consumer and update the Lamport time.
+
+    Args:
+        consumer (Consumer): The Kafka consumer instance.
+        process_id (int): The ID of the current process.
+        lamport_time (int): The current Lamport time.
+
+    Returns:
+        Tuple[Dict[str, Any], int]: A tuple containing the consumed message and the updated Lamport time.
+    """
+    msg = consumer.poll(1.0)
+    message = None
+    if msg is not None and not msg.error():
+        try:
+            message = json.loads(msg.value().decode("utf-8"))
+            received_process_id = message["process_id"]
+            received_lamport_time = int(message["lamport_time"])
+
+            if received_process_id != process_id:
+                last_lamport_time = lamport_time
+                lamport_time = max(last_lamport_time, received_lamport_time) + 1
+
+                log_message = {
+                    "event": f"Received message from process {received_process_id} with Lamport time {received_lamport_time}. Updated Lamport time: max({last_lamport_time}, {received_lamport_time})+1 = {lamport_time}",
+                    "lamport_time": lamport_time,
+                }
+                logger.info(json.dumps(log_message))
+        except json.JSONDecodeError:
+            logger.error("Failed to decode JSON message")
+
+    elif msg is not None:
+        if msg.error():
+            if msg.error().code() != KafkaError._PARTITION_EOF:
+                logger.error(msg.error())
+
+    return (message, lamport_time)
+```
+
+**Código que simula o envio e recebimento de mensagens**:
+```
+def simulate_lamport_clock(producer, consumer, process_id):
+    """
+    Simulates the Lamport logical clock for a given process.
+
+    Args:
+        producer: The producer object used to send messages.
+        consumer: The consumer object used to receive messages.
+        process_id: The ID of the current process.
+
+    Returns:
+        None
+    """
+    lamport_time = 0
+    while True:
+        start_time = time.time()
+        produce_time = random.randint(1, 3)
+        while time.time() - start_time < produce_time:
+            lamport_time = produce_messages(
+                producer, "lamport_test_1", process_id, lamport_time
+            )
+            time.sleep(1)
+
+        start_time = time.time()
+        consume_time = random.randint(2, 5)
+        while time.time() - start_time < consume_time:
+            (_, lamport_time) = consume_message(consumer, process_id, lamport_time)
+```
+
+
+Toda a lógica de funcionamento do Relógio Lógico de Lamport está dentro do consumidor e produtor de mensagens para o Kafka. Toda nova mensagem produzida o algoritmo incrementa o relógio e em cada mensagem consumida o algoritmo aplica a lógica de escolher entre o maior timestamp e incrementa um sobre ele.
+
+Além disso, temos uma função chamada "simulate_lamport_clock" que serve para simular o funcionamento de um processo independente. Isto é, ele varia as ações do processo entre consumir mensagens do kafka e produzir novas mensagens, assim teremos uma simulação de como o Relógio Lógico é atualizado ao longo do tempo, de forma supostamente aleatória.
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
