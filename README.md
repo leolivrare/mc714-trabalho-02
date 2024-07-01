@@ -275,7 +275,7 @@ def simulate_lamport_clock(producer, consumer, process_id):
 
 Toda a lógica de funcionamento do Relógio Lógico de Lamport está dentro do consumidor e produtor de mensagens para o Kafka. Toda nova mensagem produzida o algoritmo incrementa o relógio e em cada mensagem consumida o algoritmo aplica a lógica de escolher entre o maior timestamp e incrementa um sobre ele.
 
-Além disso, temos uma função chamada "simulate_lamport_clock" que serve para simular o funcionamento de um processo independente. Isto é, ele varia as ações do processo entre consumir mensagens do kafka e produzir novas mensagens, assim teremos uma simulação de como o Relógio Lógico é atualizado ao longo do tempo, de forma supostamente aleatória.
+Além disso, temos uma função chamada "simulate_lamport_clock" que serve para simular o funcionamento de um processo independente. Isto é, ele varia as ações do processo entre consumir mensagens do kafka e produzir novas mensagens, assim teremos uma simulação de como o Relógio Lógico é atualizado ao longo do tempo.
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
