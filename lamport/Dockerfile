@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir confluent-kafka
+RUN pip install --no-cache-dir confluent-kafka pytest
 
 # Make port 80 available to the world outside this container
 EXPOSE 80

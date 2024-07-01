@@ -16,19 +16,15 @@ def sort_message_queue(message_queue):
 
 
 def remove_from_queue(message_queue, sender_id):
-    # Filter the message_queue to find all messages with the matching sender_id
     matching_messages = [
         message for message in message_queue if message["process_id"] == sender_id
     ]
 
-    # If there are no matching messages, there's nothing to remove
     if not matching_messages:
         return
 
-    # Find the message with the smallest lamport_time among the matching messages
     message_to_remove = min(matching_messages, key=lambda x: x["lamport_time"])
 
-    # Remove the message from the message_queue
     message_queue.remove(message_to_remove)
 
 

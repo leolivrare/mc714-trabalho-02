@@ -189,7 +189,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
       PROCESS_ID: 1
-    command: python test_utils.py
+    command: pytest
   
   mutual_exclusion_process_1:
     build: ./mutual_exclusion
@@ -222,4 +222,4 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
       PROCESS_ID: 1
-    command: python test_utils.py
+    command: pytest
