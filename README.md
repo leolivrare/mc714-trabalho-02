@@ -145,10 +145,23 @@ make run-mutual-exclusion-tests
 ```
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Relógio Lógico de Lamport
-![image](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/f91a0d0d-e546-45b8-b613-333eef292b3b)
 
-![image](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/b9e2ff1b-1ef7-436a-ae8c-ccf8798327e3)
+### Bibliotecas e Ambiente de Execução:
+O algoritmo do Relógio Lógico de Lamport foi inteiramente implementado em Python, com o Kafka Confluent como broker de mensagens.
+Simulamos o funcionamento do algoritmo com dois processos independentes, interagindo através de troca de mensagens pelo Kafka. Os dois processos e o broker foram executados em containers Docker, de forma que fossem completamente independentes uns dos outros.
+Escolhemos por implementar usando docker para simplificar testes locais, porém é muito simples subir todos os containers num ambiente cloud. Por exemplo, podemos criar as imagens docker e subir os sistemas numa EC2 da AWS, subindo as imagens docker personalizadas via ECR.
 
+**Bibliotecas Externas Utilizadas**:
+- **confluent_kafka**: Biblioteca que possibilita a publicação e consumo de mensagens dos tópicos do Kafka.
+- **pytest**: Biblioteca utilizada para execução dos testes automatizados do projeto.
+
+### Estrutura de comunicação:
+![lamport_clock: estrutura de comunicacao](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/f91a0d0d-e546-45b8-b613-333eef292b3b)
+*Figura 01: Estrutura de comunicação entre os processos e o broker de mensagens.*
+
+### Exemplo de fluxo de atualização do relógio lógico:
+![lamport_clock: fluxo de exemplo](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/b9e2ff1b-1ef7-436a-ae8c-ccf8798327e3)
+*Figura 02: Exemplo do fluxo de atualização do relógio lógico.*
 
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
