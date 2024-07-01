@@ -10,22 +10,27 @@ from utils import consume_message, produce_messages
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def sort_message_queue(message_queue):
-    message_queue.sort(key=lambda x: (x['lamport_time'], x['process_id']))
+    message_queue.sort(key=lambda x: (x["lamport_time"], x["process_id"]))
+
 
 def remove_from_queue(message_queue, sender_id):
     # Filter the message_queue to find all messages with the matching sender_id
-    matching_messages = [message for message in message_queue if message['process_id'] == sender_id]
+    matching_messages = [
+        message for message in message_queue if message["process_id"] == sender_id
+    ]
 
     # If there are no matching messages, there's nothing to remove
     if not matching_messages:
         return
 
     # Find the message with the smallest lamport_time among the matching messages
-    message_to_remove = min(matching_messages, key=lambda x: x['lamport_time'])
+    message_to_remove = min(matching_messages, key=lambda x: x["lamport_time"])
 
     # Remove the message from the message_queue
     message_queue.remove(message_to_remove)
+
 
 def request_critical_section(
     producer, consumer, process_id, lamport_time, message_queue
@@ -60,9 +65,13 @@ def request_critical_section(
                 acknowledged.add(sender_id)
 
             elif event == "request":
-                message_queue.append({"lamport_time": sender_time, "process_id": sender_id})
+                message_queue.append(
+                    {"lamport_time": sender_time, "process_id": sender_id}
+                )
                 sort_message_queue(message_queue)
-                logger.info(f"Process {process_id} updated message queue: {message_queue}")
+                logger.info(
+                    f"Process {process_id} updated message queue: {message_queue}"
+                )
 
                 lamport_time = produce_messages(
                     producer,
@@ -76,12 +85,14 @@ def request_critical_section(
                 try:
                     remove_from_queue(message_queue, sender_id)
                     sort_message_queue(message_queue)
-                    logger.info(f"Process {process_id} updated message queue: {message_queue}")
+                    logger.info(
+                        f"Process {process_id} updated message queue: {message_queue}"
+                    )
                 except ValueError:
                     pass
         logger.info(f"Process {process_id} updated acknowledged: {acknowledged}")
         if (
-            message_queue[0]['process_id'] == process_id and len(acknowledged) == 2
+            message_queue[0]["process_id"] == process_id and len(acknowledged) == 2
         ):  # Assuming there are 3 processes in total
             break
 
@@ -124,9 +135,13 @@ def listen_and_reply(producer, consumer, process_id, lamport_time, message_queue
             sender_time = message["lamport_time"]
 
             if event == "request":
-                message_queue.append({"lamport_time": sender_time, "process_id": sender_id})
+                message_queue.append(
+                    {"lamport_time": sender_time, "process_id": sender_id}
+                )
                 sort_message_queue(message_queue)
-                logger.info(f"Process {process_id} updated message queue: {message_queue}")
+                logger.info(
+                    f"Process {process_id} updated message queue: {message_queue}"
+                )
 
                 lamport_time = produce_messages(
                     producer,
@@ -140,7 +155,9 @@ def listen_and_reply(producer, consumer, process_id, lamport_time, message_queue
                 try:
                     remove_from_queue(message_queue, sender_id)
                     sort_message_queue(message_queue)
-                    logger.info(f"Process {process_id} updated message queue: {message_queue}")
+                    logger.info(
+                        f"Process {process_id} updated message queue: {message_queue}"
+                    )
                 except ValueError:
                     pass
         else:
