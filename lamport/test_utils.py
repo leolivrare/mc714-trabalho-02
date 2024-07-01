@@ -80,7 +80,10 @@ class TestConsumeMessages(KafkaTestCase):
             self.producer, self.topic, process_id_producer, producer_lamport_time
         )
 
-        expected_message = {"process_id": process_id_producer, "lamport_time": producer_lamport_time + 1}
+        expected_message = {
+            "process_id": process_id_producer,
+            "lamport_time": producer_lamport_time + 1,
+        }
 
         # Subscribe to the topic
         self.consumer.subscribe([self.topic])
@@ -104,7 +107,10 @@ class TestConsumeMessages(KafkaTestCase):
             self.producer, self.topic, process_id_producer, producer_lamport_time
         )
 
-        expected_message = {"process_id": process_id_producer, "lamport_time": producer_lamport_time + 1}
+        expected_message = {
+            "process_id": process_id_producer,
+            "lamport_time": producer_lamport_time + 1,
+        }
 
         # Subscribe to the topic
         self.consumer.subscribe([self.topic])
