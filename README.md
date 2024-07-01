@@ -65,6 +65,11 @@ A Exclusão Mútua é um problema clássico em sistemas distribuídos, onde vár
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
+**Build do Projeto completo**
+```
+make build-all
+```
+
 ### Configurar a instância do Kafka Confluent
 *Importante: A instância do Kafka Confluent é a mesma para a simulação do Relógio Lógico de Lamport e a da Exclusão Mútua.*
 
