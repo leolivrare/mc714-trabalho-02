@@ -29,11 +29,18 @@ logs-lamport-app2:
 	docker-compose logs -f lamport_process_2
 
 # Build apenas do serviço test
-build-test:
-	docker-compose build --no-cache test
+build-lamport-test:
+	docker-compose build --no-cache lamport_test
 
-run-tests:
-	docker-compose up test
+run-lamport-tests:
+	docker-compose up lamport_test
+
+# Build apenas do serviço test
+build-mutual-exclusion-test:
+	docker-compose build --no-cache mutual_exclusion_test
+
+run-mutual-exclusion-tests:
+	docker-compose up mutual_exclusion_test
 
 # Delete and recreate the Kafka topic
 reset-lamport-topic:

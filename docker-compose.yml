@@ -182,7 +182,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
       PROCESS_ID: 2
 
-  test:
+  lamport_test:
     build: ./lamport
     depends_on:
       - broker
@@ -214,3 +214,12 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: broker:29092
       PROCESS_ID: 3
+
+  mutual_exclusion_test:
+    build: ./mutual_exclusion
+    depends_on:
+      - broker
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:29092
+      PROCESS_ID: 1
+    command: python test_utils.py
