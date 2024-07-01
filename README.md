@@ -145,6 +145,8 @@ make run-mutual-exclusion-tests
 ```
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Relógio Lógico de Lamport
+![image](https://github.com/leolivrare/mc714-trabalho-02/assets/47697560/f91a0d0d-e546-45b8-b613-333eef292b3b)
+
 
 ## Detalhes de Implementação do Algoritmo e Simulação do Problema de Exclusão Mútua
 
